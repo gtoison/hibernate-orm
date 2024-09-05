@@ -213,6 +213,7 @@ public final class Template {
 							continue;
 						}
 						else {
+							result.append( ' ' );
 							isOpenQuote = false;
 						}
 					}
