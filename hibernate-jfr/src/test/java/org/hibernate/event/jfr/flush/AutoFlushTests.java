@@ -35,10 +35,26 @@ public class AutoFlushTests {
 	@EnableEvent(FlushEvent.NAME)
 	@EnableEvent(PartialFlushEvent.NAME)
 	public void testFlushEvent(SessionFactoryScope scope) {
+		testFlushEvent( scope, false );
+	}
+
+	@Test
+	@EnableEvent(FlushEvent.NAME)
+	@EnableEvent(PartialFlushEvent.NAME)
+	public void testFlushEventWithActiveTransaction(SessionFactoryScope scope) {
+		testFlushEvent( scope, true );
+	}
+
+	private void testFlushEvent(SessionFactoryScope scope, boolean beginTransaction) {
 		jfrEvents.reset();
 		scope.inTransaction(
 				session -> {
 					TestEntity entity = new TestEntity( 1, "name_1" );
+
+					if ( beginTransaction ) {
+						session.beginTransaction();
+					}
+
 					session.persist( entity );
 					session.createQuery( "select t from TestEntity t" ).list();
 					List<RecordedEvent> events = jfrEvents.events()
